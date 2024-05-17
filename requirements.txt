@@ -1,3 +1,2 @@
 git+https://github.com/ChaoningZhang/MobileSAM@c12dd83cbe26dffdcc6a0f9e7be2f6fb024df0ed#egg=mobile_sam
-git+https://github.com/facebookresearch/segment-anything@6fdee8f2727f4506cfbbe553e23b895e27956588#egg=segment_anything
 onnxruntime==1.17.3

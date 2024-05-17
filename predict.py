@@ -5,10 +5,11 @@ import onnx
 import onnxruntime
 import numpy as np
 import torch
-from copy import deepcopy
 import matplotlib.pyplot as plt
 
 from torchvision.transforms.functional import resize, to_pil_image  # type: ignore
+
+from export_pre_model import ResizeLongestSide
 
 
 def show_mask(mask, ax):
@@ -25,48 +26,6 @@ def show_points(coords, labels, ax, marker_size=375):
                linewidth=1.25)
     ax.scatter(neg_points[:, 0], neg_points[:, 1], color='red', marker='*', s=marker_size, edgecolor='white',
                linewidth=1.25)
-
-class ResizeLongestSide:
-    """
-    Resizes images to the longest side 'target_length', as well as provides
-    methods for resizing coordinates and boxes. Provides methods for
-    transforming both numpy array and batched torch tensors.
-    """
-
-    def __init__(self, target_length: int) -> None:
-        self.target_length = target_length
-
-    def apply_image(self, image: np.ndarray) -> np.ndarray:
-        """
-        Expects a numpy array with shape HxWxC in uint8 format.
-        """
-        target_size = self.get_preprocess_shape(image.shape[0], image.shape[1], self.target_length)
-        return np.array(resize(to_pil_image(image), target_size))
-
-    def apply_coords(self, coords: np.ndarray, original_size: Tuple[int, ...]) -> np.ndarray:
-        """
-        Expects a numpy array of length 2 in the final dimension. Requires the
-        original image size in (H, W) format.
-        """
-        old_h, old_w = original_size
-        new_h, new_w = self.get_preprocess_shape(
-            original_size[0], original_size[1], self.target_length
-        )
-        coords = deepcopy(coords).astype(float)
-        coords[..., 0] = coords[..., 0] * (new_w / old_w)
-        coords[..., 1] = coords[..., 1] * (new_h / old_h)
-        return coords
-
-    @staticmethod
-    def get_preprocess_shape(oldh: int, oldw: int, long_side_length: int) -> Tuple[int, int]:
-        """
-        Compute the output size given input size and target long side length.
-        """
-        scale = long_side_length * 1.0 / max(oldh, oldw)
-        newh, neww = oldh * scale, oldw * scale
-        neww = int(neww + 0.5)
-        newh = int(newh + 0.5)
-        return (newh, neww)
 
 
 transform = ResizeLongestSide(1024)
