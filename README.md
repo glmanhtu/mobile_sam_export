@@ -26,3 +26,5 @@ Perform segmentation:
 ```bash
 python3 predict.py
 ```
+
+Example of using these onnxruntime models on NodeJS & Angular can be found here: https://github.com/glmanhtu/PapyrusViz/blob/dev/workspaces/electron-app/main/services/image.service.ts
